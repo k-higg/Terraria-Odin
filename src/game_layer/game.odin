@@ -40,7 +40,7 @@ init_game :: proc() {
 	
 	load_all_assets(&asset_manager)
 	
-	generate_world(&game_data.game_map, rand.uint64(rng))
+	generate_world(&game_data.game_map)
 	
 	game_data.camera.target = {20, 120}
 	game_data.camera.rotation = 0.0
