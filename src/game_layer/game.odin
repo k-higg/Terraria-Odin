@@ -28,6 +28,7 @@ block_id : u16 = 0
 block_type : BlockType = BlockType(block_id)
 // end Block Selector
 
+seed : i64
 rng_state : rand.Default_Random_State
 rng : rand.Generator
 
@@ -35,7 +36,8 @@ game_data : GameData = {}
 asset_manager : AssetManager = {}
 
 init_game :: proc() {
-	rng_state = rand.create(u64(time.now()._nsec))
+	seed = time.now()._nsec
+	rng_state = rand.create(u64(seed))
 	rng = rand.default_random_generator(&rng_state)
 	
 	load_all_assets(&asset_manager)

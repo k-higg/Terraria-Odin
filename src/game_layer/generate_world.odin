@@ -11,19 +11,15 @@ generate_world :: proc(gm: ^GameMap) {
     // create game map
     create_map(gm, w, h)
     
-    seed := i32(rand.uint64(rng)) + 1
-    rand_state := rand.create(u64(seed))
-    rand_gen := rand.default_random_generator(&rand_state)
-    
-    dirt_noise := fn.create_state(seed + 1)
+    dirt_noise := fn.create_state(i32(seed))
     dirt_noise.noise_type = .Open_Simplex_2
     dirt_noise.fractal_type = .FBM
     dirt_noise.octaves = 6
     dirt_noise.gain = 0.04
     dirt_noise.frequency = 0.01
     
-    cave_noise := fn.create_state(seed + 1)
-    cave_noise.noise_type = .Value_Cubic
+    cave_noise := fn.create_state(i32(seed))
+    cave_noise.noise_type = .Perlin
     cave_noise.octaves = 3
     cave_noise.frequency = 0.02
     
@@ -36,11 +32,11 @@ generate_world :: proc(gm: ^GameMap) {
     DESERT_WIDTH_MIN :: 100
     DESERT_WIDTH_MAX :: 100
     
-    desert_start := get_random_int(rand_gen, 10, w - 210)
-    desert_end := desert_start + DESERT_WIDTH_MIN + get_random_int(rand_gen, 0, DESERT_WIDTH_MAX)
+    desert_start := get_random_int(rng, 10, w - 210)
+    desert_end := desert_start + DESERT_WIDTH_MIN + get_random_int(rng, 0, DESERT_WIDTH_MAX)
     
-    keep_direction_time_stone := get_random_int(rand_gen, 5, 40)
-    direction_stone := get_random_int(rand_gen, -2, 2)
+    keep_direction_time_stone := get_random_int(rng, 5, 40)
+    direction_stone := get_random_int(rng, -2, 2)
     
     stone_height := 90
     
@@ -56,30 +52,30 @@ generate_world :: proc(gm: ^GameMap) {
         
         keep_direction_time_stone -= 1
         if keep_direction_time_stone <= 0 {
-            keep_direction_time_stone = get_random_int(rand_gen, 5, 40)
-            direction_stone = get_random_int(rand_gen, -2, 2)
+            keep_direction_time_stone = get_random_int(rng, 5, 40)
+            direction_stone = get_random_int(rng, -2, 2)
         }
         
         if direction_stone == -1 {
-            if get_random_chance(rand_gen, 0.25) {
+            if get_random_chance(rng, 0.25) {
                 stone_height -= 1
             }
         } else if direction_stone == -2 {
-            if get_random_chance(rand_gen, 0.25) {
+            if get_random_chance(rng, 0.25) {
                 stone_height -= 1
             }
-            if get_random_chance(rand_gen, 0.25) {
+            if get_random_chance(rng, 0.25) {
                 stone_height -= 1
             }               
         } else if direction_stone == 1 {
-            if get_random_chance(rand_gen, 0.25) {
+            if get_random_chance(rng, 0.25) {
                 stone_height += 1
             }        
         } else if direction_stone == 2 {
-            if get_random_chance(rand_gen, 0.25) {
+            if get_random_chance(rng, 0.25) {
                 stone_height += 1
             }
-            if get_random_chance(rand_gen, 0.25) {
+            if get_random_chance(rng, 0.25) {
                 stone_height += 1
             }
         }
@@ -132,7 +128,7 @@ generate_world :: proc(gm: ^GameMap) {
                 desert_distance : f32 = f32(1 - distance_from_desert_mid / desert_half_width)
                 
                 desert_distance = math.clamp(desert_distance, 0, 1)
-                desert_distance = math.pow(desert_distance, 0.5)
+                desert_distance = math.pow_f32(desert_distance, 0.5)
                 
                 desert_stone_start : int= 10 + stone_height
                 desert_stone_depth : int= 20 + stone_height
